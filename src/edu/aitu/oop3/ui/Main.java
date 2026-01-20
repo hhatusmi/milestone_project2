@@ -1,3 +1,5 @@
+package edu.aitu.oop3.ui;
+
 import edu.aitu.oop3.db.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,4 +23,3 @@ public class Main {
         }
     }
 }
-//niggaaa

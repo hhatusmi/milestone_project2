@@ -1,4 +1,7 @@
-package edu.aitu.oop3.db;
+package edu.aitu.oop3.repository.jdbc;
+
+import edu.aitu.oop3.model.Customer;
+import edu.aitu.oop3.db.IDB;
 
 public class CustomerRepository {
     private IDB db;

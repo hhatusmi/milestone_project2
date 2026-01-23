@@ -1,4 +1,7 @@
-package edu.aitu.oop3.db;
+package edu.aitu.oop3.repository.jdbc;
+
+import edu.aitu.oop3.db.IDB;
+import edu.aitu.oop3.model.Payment;
 
 public class PaymentRepository {
     private final IDB db;

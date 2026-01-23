@@ -1,4 +1,9 @@
-package edu.aitu.oop3.db;
+package edu.aitu.oop3.service;
+
+import edu.aitu.oop3.model.Customer;
+import edu.aitu.oop3.model.Payment;
+import edu.aitu.oop3.repository.jdbc.CustomerRepository;
+import edu.aitu.oop3.repository.jdbc.PaymentRepository;
 
 public class RentalService {
     private CustomerRepository customerRepository;

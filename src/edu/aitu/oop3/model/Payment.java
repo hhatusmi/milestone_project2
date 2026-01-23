@@ -1,4 +1,4 @@
-package edu.aitu.oop3.db;
+package edu.aitu.oop3.model;
 
 public class Payment {
     private final int id;

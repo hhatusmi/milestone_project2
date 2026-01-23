@@ -1,5 +1,7 @@
 package edu.aitu.oop3.db;
 
+import edu.aitu.oop3.model.Customer;
+
 import java.sql.*;
 
 public class PostgresDB implements IDB {

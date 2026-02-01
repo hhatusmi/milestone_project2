@@ -4,17 +4,20 @@ public class Rental {
     public void setId(int id) {
         this.id = id;
     }
+
     private int id;
     private int carId;
     private String customerName;
     private LocalDate startDate;
     private LocalDate endDate;
+
     public Rental(int carId, String customerName, LocalDate startDate, LocalDate endDate) {
         this.carId = carId;
         this.customerName = customerName;
         this.startDate = startDate;
         this.endDate = endDate;
     }
+
     public Rental(int id, int carId, String customerName, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.carId = carId;
@@ -22,6 +25,7 @@ public class Rental {
         this.startDate = startDate;
         this.endDate = endDate;
     }
+
     public int getId() {
         return id;
     }
@@ -49,4 +53,6 @@ public class Rental {
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
+
 }
+

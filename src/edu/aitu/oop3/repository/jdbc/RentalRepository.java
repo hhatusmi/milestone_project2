@@ -5,6 +5,8 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 public class RentalRepository {
     public void save(Rental rental) {
 
@@ -42,6 +44,36 @@ public class RentalRepository {
             return rentals;
         } catch (SQLException e) {
             throw new RuntimeException("Error reading rentals", e);
+        }
+    }
+
+    public class rentalRepository implements Repository<Rental> {
+
+        private List<Rental> rentals = new ArrayList<>();
+
+        @Override
+        public void save(Rental rental) {
+            rentals.add(rental);
+            System.out.println("Saving rental for customer: " + rental.getCustomerName());
+        }
+
+        @Override
+        public List<Rental> findAll() {
+            System.out.println("Returning all rentals");
+            return rentals;
+        }
+
+        @Override
+        public Optional<Rental> findById(int id) {
+            return rentals.stream()
+                    .filter(r -> r.getId() == id)
+                    .findFirst();
+        }
+
+        @Override
+        public void delete(int id) {
+            rentals.removeIf(r -> r.getId() == id);
+            System.out.println("Deleted rental with id: " + id);
         }
     }
 }

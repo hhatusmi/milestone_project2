@@ -16,12 +16,12 @@ public class RentalService {
     }
 
     public boolean createRental(int customerId, double amount, String paymentDate) {
-        Customer customer = customerRepository.getCustomerById(customerId);
+        Customer customer = CustomerRepository.getcustomerById(customerId);
 
         if (customer != null) {
             Payment payment = new Payment(0, customerId, amount, paymentDate);
             try {
-                paymentRepository.addPayment(payment);
+                PaymentRepository.addPayment(payment);
                 System.out.println("Rental created successfully for " + customer.getName());
                 return true;
             } catch (Exception e) {

@@ -7,8 +7,7 @@ public interface Repository<T> {
     T create(T entity) throws SQLException;
     T findById(int id) throws SQLException;
     List<T> findAll() throws SQLException;
-    void update(T entity) throws SQLException, Exception;
+    void update(T entity) throws SQLException;
     void delete(int id) throws SQLException;
-    void save(T entity) throws SQLException; // create или update
+    void save(T entity) throws SQLException;
 }
-

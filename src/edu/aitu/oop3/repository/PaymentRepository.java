@@ -9,23 +9,25 @@ import java.util.List;
 
 public class PaymentRepository implements Repository<Payment> {
 
-    private final Connection connection;
-
-    public PaymentRepository() {
-        this.connection = DatabaseConnection.getInstance().getConnection();
-    }
+    private final DatabaseConnection db = DatabaseConnection.getInstance();
 
     @Override
     public Payment create(Payment payment) throws SQLException {
-        String sql = "INSERT INTO payments (rental_id, amount, payment_date, status) VALUES (?, ?, ?, ?) RETURNING id";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, payment.getRentalId());
+        String sql = """
+                INSERT INTO payments (rental_id, amount, paid_at)
+                VALUES (?, ?, ?)
+                RETURNING id
+                """;
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, payment.getRentalId());
             stmt.setDouble(2, payment.getAmount());
-            stmt.setDate(3, Date.valueOf(payment.getPaymentDate()));
-            stmt.setString(4, payment.getStatus());
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                payment.setId(rs.getInt("id"));
+            stmt.setTimestamp(3, Timestamp.valueOf(payment.getPaidAt()));
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) payment.setId(rs.getLong("id"));
             }
         }
         return payment;
@@ -34,55 +36,49 @@ public class PaymentRepository implements Repository<Payment> {
     @Override
     public Payment findById(int id) throws SQLException {
         String sql = "SELECT * FROM payments WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new Payment(
-                        rs.getInt("id"),
-                        rs.getInt("rental_id"),
-                        rs.getDouble("amount"),
-                        rs.getDate("payment_date").toLocalDate(),
-                        rs.getString("status")
-                );
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapPayment(rs);
             }
         }
         return null;
     }
 
     @Override
-    public void save(Payment item) {
-
-    }
-
-    @Override
     public List<Payment> findAll() throws SQLException {
-        List<Payment> payments = new ArrayList<>();
+        List<Payment> list = new ArrayList<>();
         String sql = "SELECT * FROM payments";
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                payments.add(new Payment(
-                        rs.getInt("id"),
-                        rs.getInt("rental_id"),
-                        rs.getDouble("amount"),
-                        rs.getDate("payment_date").toLocalDate(),
-                        rs.getString("status")
-                ));
-            }
+
+            while (rs.next()) list.add(mapPayment(rs));
         }
-        return payments;
+        return list;
     }
 
     @Override
     public void update(Payment payment) throws SQLException {
-        String sql = "UPDATE payments SET rental_id = ?, amount = ?, payment_date = ?, status = ? WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, payment.getRentalId());
+        String sql = """
+                UPDATE payments
+                SET rental_id = ?, amount = ?, paid_at = ?
+                WHERE id = ?
+                """;
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, payment.getRentalId());
             stmt.setDouble(2, payment.getAmount());
-            stmt.setDate(3, Date.valueOf(payment.getPaymentDate()));
-            stmt.setString(4, payment.getStatus());
-            stmt.setInt(5, payment.getId());
+            stmt.setTimestamp(3, Timestamp.valueOf(payment.getPaidAt()));
+            stmt.setLong(4, payment.getId());
+
             stmt.executeUpdate();
         }
     }
@@ -90,10 +86,27 @@ public class PaymentRepository implements Repository<Payment> {
     @Override
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM payments WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, id);
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
             stmt.executeUpdate();
         }
     }
-}
 
+    @Override
+    public void save(Payment payment) throws SQLException {
+        if (payment.getId() == 0) create(payment);
+        else update(payment);
+    }
+
+    private Payment mapPayment(ResultSet rs) throws SQLException {
+        Payment p = new Payment();
+        p.setId(rs.getLong("id"));
+        p.setRentalId(rs.getLong("rental_id"));
+        p.setAmount(rs.getDouble("amount"));
+        p.setPaidAt(rs.getTimestamp("paid_at").toLocalDateTime());
+        return p;
+    }
+}

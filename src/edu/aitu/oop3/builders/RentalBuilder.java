@@ -45,4 +45,3 @@ public class RentalBuilder {
         return new Rental(customer, car, startDate, endDate, totalPrice);
     }
 }
-

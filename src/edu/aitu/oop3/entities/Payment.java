@@ -1,53 +1,39 @@
 package edu.aitu.oop3.entities;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class Payment {
-    private int id;
-    private int rentalId;
+public class Payment implements Identifiable {
+
+    private long id;
+    private long rentalId;
     private double amount;
-    private LocalDate paymentDate;
-    private String status;
+    private LocalDateTime paidAt;
 
     public Payment() {}
 
-    public Payment(int id, int rentalId, double amount, LocalDate paymentDate, String status) {
-        this.id = id;
+    public Payment(long rentalId, double amount, LocalDateTime paidAt) {
         this.rentalId = rentalId;
         this.amount = amount;
-        this.paymentDate = paymentDate;
-        this.status = status;
+        this.paidAt = paidAt;
     }
 
-    public Payment(int rentalId, double amount, LocalDate paymentDate, String status) {
-        this.rentalId = rentalId;
-        this.amount = amount;
-        this.paymentDate = paymentDate;
-        this.status = status;
-    }
+    @Override
+    public long getId() { return id; }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    @Override
+    public void setId(long id) { this.id = id; }
 
-    public int getRentalId() { return rentalId; }
-    public void setRentalId(int rentalId) { this.rentalId = rentalId; }
+    public long getRentalId() { return rentalId; }
+    public void setRentalId(long rentalId) { this.rentalId = rentalId; }
 
     public double getAmount() { return amount; }
     public void setAmount(double amount) { this.amount = amount; }
 
-    public LocalDate getPaymentDate() { return paymentDate; }
-    public void setPaymentDate(LocalDate paymentDate) { this.paymentDate = paymentDate; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public LocalDateTime getPaidAt() { return paidAt; }
+    public void setPaidAt(LocalDateTime paidAt) { this.paidAt = paidAt; }
 
     @Override
     public String toString() {
-        return "Payment{id=" + id +
-                ", rentalId=" + rentalId +
-                ", amount=" + amount +
-                ", paymentDate=" + paymentDate +
-                ", status='" + status + '\'' + '}';
+        return "Payment{id=" + id + ", rentalId=" + rentalId + ", amount=" + amount + ", paidAt=" + paidAt + "}";
     }
 }
-

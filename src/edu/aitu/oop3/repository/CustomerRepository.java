@@ -14,7 +14,7 @@ public class CustomerRepository implements Repository<Customer> {
     @Override
     public Customer create(Customer customer) throws SQLException {
         String sql = """
-                INSERT INTO customers (name, email, phone_number)
+                INSERT INTO customers (name, phone, email)
                 VALUES (?, ?, ?)
                 RETURNING id
                 """;
@@ -23,12 +23,11 @@ public class CustomerRepository implements Repository<Customer> {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, customer.getName());
-            stmt.setString(2, customer.getEmail());
-            stmt.setString(3, customer.getPhoneNumber());
+            stmt.setString(2, customer.getPhone());
+            stmt.setString(3, customer.getEmail());
 
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                customer.setId(rs.getInt("id"));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) customer.setId(rs.getLong("id"));
             }
         }
         return customer;
@@ -41,11 +40,10 @@ public class CustomerRepository implements Repository<Customer> {
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
+            stmt.setLong(1, id);
 
-            if (rs.next()) {
-                return mapCustomer(rs);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapCustomer(rs);
             }
         }
         return null;
@@ -53,31 +51,34 @@ public class CustomerRepository implements Repository<Customer> {
 
     @Override
     public List<Customer> findAll() throws SQLException {
-        List<Customer> customers = new ArrayList<>();
+        List<Customer> list = new ArrayList<>();
         String sql = "SELECT * FROM customers";
 
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                customers.add(mapCustomer(rs));
-            }
+            while (rs.next()) list.add(mapCustomer(rs));
         }
-        return customers;
+        return list;
     }
 
     @Override
     public void update(Customer customer) throws SQLException {
-        String sql = "UPDATE customers SET name = ?, email = ?, phone_number = ? WHERE id = ?";
+        String sql = """
+                UPDATE customers
+                SET name = ?, phone = ?, email = ?
+                WHERE id = ?
+                """;
 
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, customer.getName());
-            stmt.setString(2, customer.getEmail());
-            stmt.setString(3, customer.getPhoneNumber());
-            stmt.setInt(4, customer.getId());
+            stmt.setString(2, customer.getPhone());
+            stmt.setString(3, customer.getEmail());
+            stmt.setLong(4, customer.getId());
+
             stmt.executeUpdate();
         }
     }
@@ -89,27 +90,23 @@ public class CustomerRepository implements Repository<Customer> {
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, id);
+            stmt.setLong(1, id);
             stmt.executeUpdate();
         }
     }
 
     @Override
     public void save(Customer customer) throws SQLException {
-        if (customer.getId() == 0) {
-            create(customer);
-        } else {
-            update(customer);
-        }
+        if (customer.getId() == 0) create(customer);
+        else update(customer);
     }
 
     private Customer mapCustomer(ResultSet rs) throws SQLException {
-        return new Customer(
-                rs.getInt("id"),
-                rs.getString("name"),
-                rs.getString("email"),
-                rs.getString("phone_number")
-        );
+        Customer c = new Customer();
+        c.setId(rs.getLong("id"));
+        c.setName(rs.getString("name"));
+        c.setPhone(rs.getString("phone"));
+        c.setEmail(rs.getString("email"));
+        return c;
     }
 }
-

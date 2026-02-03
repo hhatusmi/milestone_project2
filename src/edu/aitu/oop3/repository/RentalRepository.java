@@ -1,6 +1,8 @@
 package edu.aitu.oop3.repository;
 
 import edu.aitu.oop3.db.DatabaseConnection;
+import edu.aitu.oop3.entities.Car;
+import edu.aitu.oop3.entities.Customer;
 import edu.aitu.oop3.entities.Rental;
 
 import java.sql.*;
@@ -22,15 +24,14 @@ public class RentalRepository implements Repository<Rental> {
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, rental.getCustomer().getId());
-            stmt.setInt(2, rental.getCar().getId());
+            stmt.setLong(1, rental.getCustomer().getId());
+            stmt.setLong(2, rental.getCar().getId());
             stmt.setDate(3, Date.valueOf(rental.getStartDate()));
             stmt.setDate(4, Date.valueOf(rental.getEndDate()));
             stmt.setDouble(5, rental.getTotalPrice());
 
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                rental.setId(rs.getInt("id"));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) rental.setId(rs.getLong("id"));
             }
         }
         return rental;
@@ -43,11 +44,10 @@ public class RentalRepository implements Repository<Rental> {
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
+            stmt.setLong(1, id);
 
-            if (rs.next()) {
-                return mapRental(rs);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapRental(rs);
             }
         }
         return null;
@@ -55,18 +55,16 @@ public class RentalRepository implements Repository<Rental> {
 
     @Override
     public List<Rental> findAll() throws SQLException {
-        List<Rental> rentals = new ArrayList<>();
+        List<Rental> list = new ArrayList<>();
         String sql = "SELECT * FROM rentals";
 
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                rentals.add(mapRental(rs));
-            }
+            while (rs.next()) list.add(mapRental(rs));
         }
-        return rentals;
+        return list;
     }
 
     @Override
@@ -80,12 +78,12 @@ public class RentalRepository implements Repository<Rental> {
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, rental.getCustomer().getId());
-            stmt.setInt(2, rental.getCar().getId());
+            stmt.setLong(1, rental.getCustomer().getId());
+            stmt.setLong(2, rental.getCar().getId());
             stmt.setDate(3, Date.valueOf(rental.getStartDate()));
             stmt.setDate(4, Date.valueOf(rental.getEndDate()));
             stmt.setDouble(5, rental.getTotalPrice());
-            stmt.setInt(6, rental.getId());
+            stmt.setLong(6, rental.getId());
 
             stmt.executeUpdate();
         }
@@ -98,32 +96,32 @@ public class RentalRepository implements Repository<Rental> {
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, id);
+            stmt.setLong(1, id);
             stmt.executeUpdate();
         }
     }
 
     @Override
     public void save(Rental rental) throws SQLException {
-        if (rental.getId() == 0) {
-            create(rental);
-        } else {
-            update(rental);
-        }
+        if (rental.getId() == 0) create(rental);
+        else update(rental);
     }
 
     private Rental mapRental(ResultSet rs) throws SQLException {
-        // Здесь можно потом добавить join с таблицами cars и customers
-        Rental rental = new Rental();
-        rental.setId(rs.getInt("id"));
-        // Временно создаём Customer и Car с id
-        rental.setCustomer(new edu.aitu.oop3.entities.Customer());
-        rental.getCustomer().setId(rs.getInt("customer_id"));
-        rental.setCar(new edu.aitu.oop3.entities.Car());
-        rental.getCar().setId(rs.getInt("car_id"));
-        rental.setStartDate(rs.getDate("start_date").toLocalDate());
-        rental.setEndDate(rs.getDate("end_date").toLocalDate());
-        rental.setTotalPrice(rs.getDouble("total_price"));
-        return rental;
+        Rental r = new Rental();
+        r.setId(rs.getLong("id"));
+
+        Customer c = new Customer();
+        c.setId(rs.getLong("customer_id"));
+        r.setCustomer(c);
+
+        Car car = new Car();
+        car.setId(rs.getLong("car_id"));
+        r.setCar(car);
+
+        r.setStartDate(rs.getDate("start_date").toLocalDate());
+        r.setEndDate(rs.getDate("end_date").toLocalDate());
+        r.setTotalPrice(rs.getDouble("total_price"));
+        return r;
     }
 }

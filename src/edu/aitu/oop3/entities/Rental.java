@@ -2,8 +2,9 @@ package edu.aitu.oop3.entities;
 
 import java.time.LocalDate;
 
-public class Rental {
-    private int id;
+public class Rental implements Identifiable {
+
+    private long id;
     private Customer customer;
     private Car car;
     private LocalDate startDate;
@@ -12,9 +13,7 @@ public class Rental {
 
     public Rental() {}
 
-    public Rental(int id, Customer customer, Car car,
-                  LocalDate startDate, LocalDate endDate, double totalPrice) {
-        this.id = id;
+    public Rental(Customer customer, Car car, LocalDate startDate, LocalDate endDate, double totalPrice) {
         this.customer = customer;
         this.car = car;
         this.startDate = startDate;
@@ -22,17 +21,11 @@ public class Rental {
         this.totalPrice = totalPrice;
     }
 
-    public Rental(Customer customer, Car car,
-                  LocalDate startDate, LocalDate endDate, double totalPrice) {
-        this.customer = customer;
-        this.car = car;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.totalPrice = totalPrice;
-    }
+    @Override
+    public long getId() { return id; }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    @Override
+    public void setId(long id) { this.id = id; }
 
     public Customer getCustomer() { return customer; }
     public void setCustomer(Customer customer) { this.customer = customer; }
@@ -51,15 +44,8 @@ public class Rental {
 
     @Override
     public String toString() {
-        return "Rental{" +
-                "id=" + id +
-                ", customer=" + customer +
-                ", car=" + car +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", totalPrice=" + totalPrice +
-                '}';
+        return "Rental{id=" + id + ", customerId=" + (customer != null ? customer.getId() : null) +
+                ", carId=" + (car != null ? car.getId() : null) +
+                ", start=" + startDate + ", end=" + endDate + ", total=" + totalPrice + "}";
     }
 }
-
-

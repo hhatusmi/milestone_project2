@@ -13,24 +13,28 @@ public class CarRepository implements Repository<Car> {
 
     @Override
     public Car create(Car car) throws SQLException {
+
         String sql = """
-                INSERT INTO cars (brand, model, year, price_per_day, type)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO cars (plate, brand, model, year, available, price_per_day, type)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 RETURNING id
                 """;
 
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, car.getBrand());
-            stmt.setString(2, car.getModel());
-            stmt.setInt(3, car.getYear());
-            stmt.setDouble(4, car.getPricePerDay());
-            stmt.setString(5, car.getType());
+            stmt.setString(1, car.getPlate());
+            stmt.setString(2, car.getBrand());
+            stmt.setString(3, car.getModel());
+            stmt.setInt(4, car.getYear());
+            stmt.setBoolean(5, car.isAvailable());
+            stmt.setDouble(6, car.getPricePerDay());
+            stmt.setString(7, car.getType());
 
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                car.setId(rs.getInt("id"));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    car.setId(rs.getLong("id"));   // ✅ long
+                }
             }
         }
         return car;
@@ -43,11 +47,12 @@ public class CarRepository implements Repository<Car> {
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
+            stmt.setLong(1, id); // ✅ можно и setInt, но long универсальнее
 
-            if (rs.next()) {
-                return mapCar(rs);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapCar(rs);
+                }
             }
         }
         return null;
@@ -71,21 +76,25 @@ public class CarRepository implements Repository<Car> {
 
     @Override
     public void update(Car car) throws SQLException {
+
         String sql = """
                 UPDATE cars
-                SET brand = ?, model = ?, year = ?, price_per_day = ?, type = ?
+                SET plate = ?, brand = ?, model = ?, year = ?, available = ?, price_per_day = ?, type = ?
                 WHERE id = ?
                 """;
 
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, car.getBrand());
-            stmt.setString(2, car.getModel());
-            stmt.setInt(3, car.getYear());
-            stmt.setDouble(4, car.getPricePerDay());
-            stmt.setString(5, car.getType());
-            stmt.setInt(6, car.getId());
+            stmt.setString(1, car.getPlate());
+            stmt.setString(2, car.getBrand());
+            stmt.setString(3, car.getModel());
+            stmt.setInt(4, car.getYear());
+            stmt.setBoolean(5, car.isAvailable());
+            stmt.setDouble(6, car.getPricePerDay());
+            stmt.setString(7, car.getType());
+            stmt.setLong(8, car.getId()); // ✅ long
+
             stmt.executeUpdate();
         }
     }
@@ -97,7 +106,7 @@ public class CarRepository implements Repository<Car> {
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, id);
+            stmt.setLong(1, id);
             stmt.executeUpdate();
         }
     }
@@ -112,14 +121,17 @@ public class CarRepository implements Repository<Car> {
     }
 
     private Car mapCar(ResultSet rs) throws SQLException {
-        return new Car(
-                rs.getInt("id"),
-                rs.getString("brand"),
-                rs.getString("model"),
-                rs.getInt("year"),
-                rs.getDouble("price_per_day"),
-                rs.getString("type")
-        );
+        Car car = new Car();
+
+        car.setId(rs.getLong("id"));
+        car.setPlate(rs.getString("plate"));
+        car.setBrand(rs.getString("brand"));
+        car.setModel(rs.getString("model"));
+        car.setYear(rs.getInt("year"));
+        car.setAvailable(rs.getBoolean("available"));
+        car.setPricePerDay(rs.getDouble("price_per_day"));
+        car.setType(rs.getString("type"));
+
+        return car;
     }
 }
-

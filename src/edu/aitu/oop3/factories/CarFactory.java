@@ -5,33 +5,14 @@ import edu.aitu.oop3.entities.Car;
 public class CarFactory {
 
     public static Car createCar(String type, String brand, String model, int year, double pricePerDay) {
-        switch (type.toLowerCase()) {
-            case "sedan":
-                return new Car.CarBuilder()
-                        .setBrand(brand)
-                        .setModel(model)
-                        .setYear(year)
-                        .setPricePerDay(pricePerDay)
-                        .setType("Sedan")
-                        .build();
-            case "suv":
-                return new Car.CarBuilder()
-                        .setBrand(brand)
-                        .setModel(model)
-                        .setYear(year)
-                        .setPricePerDay(pricePerDay)
-                        .setType("SUV")
-                        .build();
-            case "truck":
-                return new Car.CarBuilder()
-                        .setBrand(brand)
-                        .setModel(model)
-                        .setYear(year)
-                        .setPricePerDay(pricePerDay)
-                        .setType("Truck")
-                        .build();
-            default:
-                throw new IllegalArgumentException("Unknown car type: " + type);
-        }
+        Car car = new Car();
+        car.setBrand(brand);
+        car.setModel(model);
+        car.setYear(year);
+        car.setPricePerDay(pricePerDay);
+        car.setType(type);
+        car.setAvailable(true);
+        car.setPlate("KZ-" + brand.substring(0, Math.min(3, brand.length())).toUpperCase() + "-" + year);
+        return car;
     }
 }

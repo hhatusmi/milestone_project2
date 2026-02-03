@@ -4,35 +4,14 @@ import edu.aitu.oop3.entities.Payment;
 import edu.aitu.oop3.repository.PaymentRepository;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
 
 public class PaymentService {
 
-    private final PaymentRepository paymentRepository;
+    private final PaymentRepository paymentRepository = new PaymentRepository();
 
-    public PaymentService() {
-        this.paymentRepository = new PaymentRepository();
-    }
-
-    public Payment processPayment(int rentalId, double amount) throws SQLException {
-        Payment payment = new Payment(rentalId, amount, LocalDate.now(), "PAID");
+    public Payment processPayment(long rentalId, double amount) throws SQLException {
+        Payment payment = new Payment(rentalId, amount, LocalDateTime.now());
         return paymentRepository.create(payment);
-    }
-
-    public Payment findPaymentById(int id) throws SQLException {
-        return paymentRepository.findById(id);
-    }
-
-    public List<Payment> listPayments() throws SQLException {
-        return paymentRepository.findAll();
-    }
-
-    public void updatePayment(Payment payment) throws SQLException {
-        paymentRepository.update(payment);
-    }
-
-    public void deletePayment(int id) throws SQLException {
-        paymentRepository.delete(id);
     }
 }

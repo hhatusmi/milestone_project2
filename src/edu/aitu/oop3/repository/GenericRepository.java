@@ -7,7 +7,7 @@ import java.util.List;
 
 public class GenericRepository<T extends Identifiable> implements Repository<T> {
     private final List<T> items = new ArrayList<>();
-    private int currentId = 1; // для автоинкремента id
+    private int currentId = 1;
 
     @Override
     public T create(T entity) {
@@ -55,4 +55,3 @@ public class GenericRepository<T extends Identifiable> implements Repository<T> 
         items.removeIf(item -> item.getId() == id);
     }
 }
-

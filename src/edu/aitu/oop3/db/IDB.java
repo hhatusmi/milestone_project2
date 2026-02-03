@@ -8,4 +8,3 @@ public interface IDB {
     void update(Object entity);
     void delete(int id);
 }
-

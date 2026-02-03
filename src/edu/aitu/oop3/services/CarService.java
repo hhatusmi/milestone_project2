@@ -28,7 +28,6 @@ public class CarService {
         return carRepository.findAll();
     }
 
-    // Фильтрация машин по типу с использованием лямбд
     public List<Car> filterCarsByType(String type) throws SQLException {
         return carRepository.findAll()
                 .stream()

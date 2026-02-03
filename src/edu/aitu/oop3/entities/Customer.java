@@ -1,45 +1,44 @@
 package edu.aitu.oop3.entities;
 
 public class Customer implements Identifiable {
-    private int id;
+
+    private long id;
     private String name;
+    private String phone;
     private String email;
-    private String phoneNumber;
 
     public Customer() {}
 
-    public Customer(int id, String name, String email, String phoneNumber) {
+    public Customer(String name, String phone, String email) {
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+    }
+
+    public Customer(long id, String name, String phone, String email) {
         this.id = id;
         this.name = name;
+        this.phone = phone;
         this.email = email;
-        this.phoneNumber = phoneNumber;
-    }
-
-    public Customer(String name, String email, String phoneNumber) {
-        this.name = name;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
     }
 
     @Override
-    public int getId() { return id; }
+    public long getId() { return id; }
+
     @Override
-    public void setId(int id) { this.id = id; }
+    public void setId(long id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-
     @Override
     public String toString() {
-        return "Customer{id=" + id + ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' + '}';
+        return "Customer{id=" + id + ", name='" + name + "', phone='" + phone + "', email='" + email + "'}";
     }
 }
-

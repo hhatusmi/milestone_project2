@@ -1,6 +1,6 @@
 package edu.aitu.oop3.entities;
 
 public interface Identifiable {
-    int getId();
-    void setId(int id);
+    long getId();
+    void setId(long id);
 }

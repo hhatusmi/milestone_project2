@@ -45,8 +45,6 @@ public class PostgresDB implements IDB {
         }
     }
 
-    // ================= CUSTOMER CRUD =================
-
     @Override
     public void create(Object entity) {
         if (entity instanceof Customer customer) {
@@ -55,7 +53,7 @@ public class PostgresDB implements IDB {
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 stmt.setString(1, customer.getName());
                 stmt.setString(2, customer.getEmail());
-                stmt.setString(3, customer.getPhoneNumber());
+                stmt.setString(3, customer.getPhone());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -92,8 +90,8 @@ public class PostgresDB implements IDB {
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 stmt.setString(1, customer.getName());
                 stmt.setString(2, customer.getEmail());
-                stmt.setString(3, customer.getPhoneNumber());
-                stmt.setInt(4, customer.getId());
+                stmt.setString(3, customer.getPhone());
+                stmt.setLong(4, customer.getId());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -112,4 +110,3 @@ public class PostgresDB implements IDB {
         }
     }
 }
-

@@ -1,25 +1,23 @@
 package edu.aitu.oop3.ui;
-
-import edu.aitu.oop3.db.DatabaseConnection;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import edu.aitu.oop3.model.Car;
+import edu.aitu.oop3.repository.jdbc.CarRepository;
+import java.math.BigDecimal;
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Connecting to Supabase...");
-        try (Connection connection = DatabaseConnection.getConnection()) {
-            System.out.println("Connected successfully!");
-            String sql = "SELECT CURRENT_TIMESTAMP";
-            try (PreparedStatement stmt = connection.prepareStatement(sql);
-                 ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    System.out.println("Database time: " + rs.getTimestamp(1));
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println("error while connecting to database:");
-            e.printStackTrace();
-        }
+        CarRepository repo = new CarRepository();
+        Car car = new Car(
+                "KZ-123-ABC",
+                "Toyota",
+                "Camry",
+                2020,
+                new BigDecimal("15000.00"),
+                "AVAILABLE",
+                true
+        );
+        repo.save(car);
+        System.out.println("Saved car id = " + car.getId());
+        repo.findAll().forEach(c ->
+                System.out.println(c.getId() + " " + c.getPlate() + " " + c.getBrand() + " " + c.getModel() + " " + c.getDailyPrice())
+        );
     }
 }

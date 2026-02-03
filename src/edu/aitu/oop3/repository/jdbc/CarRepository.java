@@ -7,45 +7,82 @@ import java.util.List;
 public class CarRepository {
     public void save(Car car) {
         String sql = """
-            INSERT INTO cars (brand, model, year, available)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO cars (plate, brand, model, year, daily_price, status, available)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """;
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, car.getBrand());
-            ps.setString(2, car.getModel());
-            ps.setInt(3, car.getYear());
-            ps.setBoolean(4, car.isAvailable());
+            ps.setString(1, car.getPlate());
+            ps.setString(2, car.getBrand());
+            ps.setString(3, car.getModel());
+            ps.setInt(4, car.getYear());
+            ps.setBigDecimal(5, car.getDailyPrice());
+            ps.setString(6, car.getStatus());
+            ps.setBoolean(7, car.isAvailable());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    car.setId(rs.getInt(1));
-                }
+                if (rs.next()) car.setId(rs.getInt(1));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error saving car", e);
         }
     }
     public List<Car> findAll() {
-        String sql = "SELECT id, brand, model, year, available FROM cars ORDER BY id";
+        String sql = "SELECT id, plate, brand, model, year, daily_price, status, available FROM cars ORDER BY id";
         List<Car> cars = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                Car car = new Car(
+                cars.add(new Car(
                         rs.getInt("id"),
+                        rs.getString("plate"),
                         rs.getString("brand"),
                         rs.getString("model"),
                         rs.getInt("year"),
+                        rs.getBigDecimal("daily_price"),
+                        rs.getString("status"),
                         rs.getBoolean("available")
-                );
-                cars.add(car);
+                ));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error reading cars", e);
         }
         return cars;
     }
+    public Car findById(int id) {
+        String sql = "SELECT id, plate, brand, model, year, daily_price, status, available FROM cars WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Car(
+                            rs.getInt("id"),
+                            rs.getString("plate"),
+                            rs.getString("brand"),
+                            rs.getString("model"),
+                            rs.getInt("year"),
+                            rs.getBigDecimal("daily_price"),
+                            rs.getString("status"),
+                            rs.getBoolean("available")
+                    );
+                }
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error finding car by id", e);
+        }
+    }
+    public void setAvailability(int carId, boolean available) {
+        String sql = "UPDATE cars SET available = ? WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBoolean(1, available);
+            ps.setInt(2, carId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating car availability", e);
+        }
+    }
 }
-

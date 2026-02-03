@@ -9,21 +9,25 @@ import java.util.List;
 
 public class CarRepository implements Repository<Car> {
 
-    private final Connection connection;
-
-    public CarRepository() {
-        this.connection = DatabaseConnection.getInstance().getConnection();
-    }
+    private final DatabaseConnection db = DatabaseConnection.getInstance();
 
     @Override
     public Car create(Car car) throws SQLException {
-        String sql = "INSERT INTO cars (brand, model, year, price_per_day, type) VALUES (?, ?, ?, ?, ?) RETURNING id";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        String sql = """
+                INSERT INTO cars (brand, model, year, price_per_day, type)
+                VALUES (?, ?, ?, ?, ?)
+                RETURNING id
+                """;
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, car.getBrand());
             stmt.setString(2, car.getModel());
             stmt.setInt(3, car.getYear());
             stmt.setDouble(4, car.getPricePerDay());
             stmt.setString(5, car.getType());
+
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 car.setId(rs.getInt("id"));
@@ -35,43 +39,31 @@ public class CarRepository implements Repository<Car> {
     @Override
     public Car findById(int id) throws SQLException {
         String sql = "SELECT * FROM cars WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
+
             if (rs.next()) {
-                return new Car(
-                        rs.getInt("id"),
-                        rs.getString("brand"),
-                        rs.getString("model"),
-                        rs.getInt("year"),
-                        rs.getDouble("price_per_day"),
-                        rs.getString("type")
-                );
+                return mapCar(rs);
             }
         }
         return null;
     }
 
     @Override
-    public void save(Car item) {
-
-    }
-
-    @Override
     public List<Car> findAll() throws SQLException {
         List<Car> cars = new ArrayList<>();
         String sql = "SELECT * FROM cars";
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
-                cars.add(new Car(
-                        rs.getInt("id"),
-                        rs.getString("brand"),
-                        rs.getString("model"),
-                        rs.getInt("year"),
-                        rs.getDouble("price_per_day"),
-                        rs.getString("type")
-                ));
+                cars.add(mapCar(rs));
             }
         }
         return cars;
@@ -79,8 +71,15 @@ public class CarRepository implements Repository<Car> {
 
     @Override
     public void update(Car car) throws SQLException {
-        String sql = "UPDATE cars SET brand = ?, model = ?, year = ?, price_per_day = ?, type = ? WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        String sql = """
+                UPDATE cars
+                SET brand = ?, model = ?, year = ?, price_per_day = ?, type = ?
+                WHERE id = ?
+                """;
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, car.getBrand());
             stmt.setString(2, car.getModel());
             stmt.setInt(3, car.getYear());
@@ -94,10 +93,33 @@ public class CarRepository implements Repository<Car> {
     @Override
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM cars WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setInt(1, id);
             stmt.executeUpdate();
         }
+    }
+
+    @Override
+    public void save(Car car) throws SQLException {
+        if (car.getId() == 0) {
+            create(car);
+        } else {
+            update(car);
+        }
+    }
+
+    private Car mapCar(ResultSet rs) throws SQLException {
+        return new Car(
+                rs.getInt("id"),
+                rs.getString("brand"),
+                rs.getString("model"),
+                rs.getInt("year"),
+                rs.getDouble("price_per_day"),
+                rs.getString("type")
+        );
     }
 }
 

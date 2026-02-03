@@ -1,38 +1,58 @@
 package edu.aitu.oop3.repository;
 
+import edu.aitu.oop3.entities.Identifiable;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-public class GenericRepository<T> implements Repository<T> {
-    private List<T> items = new ArrayList<>();
+public class GenericRepository<T extends Identifiable> implements Repository<T> {
+    private final List<T> items = new ArrayList<>();
+    private int currentId = 1; // для автоинкремента id
 
     @Override
-    public void save(T item) {
-        items.add(item);
+    public T create(T entity) {
+        entity.setId(currentId++);
+        items.add(entity);
+        return entity;
     }
 
     @Override
-    public List<T> findAll() {
-        return items;
+    public void save(T entity) {
+        if (entity.getId() == 0) {
+            create(entity);
+        } else {
+            update(entity);
+        }
     }
 
     @Override
-    public void update(T entity) throws Exception {
-
-    }
-
-    @Override
-    public T create(T entity) throws Exception {
-        return null;
+    public void update(T entity) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).getId() == entity.getId()) {
+                items.set(i, entity);
+                return;
+            }
+        }
     }
 
     @Override
     public T findById(int id) {
-        return (T) Optional.empty();
+        for (T item : items) {
+            if (item.getId() == id) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<T> findAll() {
+        return new ArrayList<>(items);
     }
 
     @Override
     public void delete(int id) {
+        items.removeIf(item -> item.getId() == id);
     }
 }
+

@@ -7,18 +7,21 @@ import java.sql.SQLException;
 public class DatabaseConnection {
 
     private static DatabaseConnection instance;
-    private static Connection connection;
+    private Connection connection;
 
     private static final String URL =
-            "jdbc:postgresql://aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres?sslmode=require";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "YOUR_PASSWORD";
+            "jdbc:postgresql://aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres";
+    private static final String USER =
+            "postgres.ftmenecmibzocczrpnec";
+    private static final String PASSWORD =
+            "RQt1YKf0GhXRnRjz";
 
     private DatabaseConnection() {
         try {
-            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            System.out.println("✅ Connected to database");
         } catch (SQLException e) {
-            throw new RuntimeException("Database connection failed", e);
+            throw new RuntimeException("Failed to connect to database", e);
         }
     }
 
@@ -29,7 +32,10 @@ public class DatabaseConnection {
         return instance;
     }
 
-    public static Connection getConnection() {
+    public Connection getConnection() {
         return connection;
     }
 }
+
+
+

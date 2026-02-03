@@ -10,9 +10,9 @@ public class PostgresDB implements IDB {
     private Connection connection;
 
     private static final String URL =
-            "jdbc:postgresql://aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres?sslmode=require";
+            "jdbc:postgresql://aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres";
     private static final String USER = "postgres.ftmenecmibzocczrpnec";
-    private static final String PASSWORD = "wrwnUdAIXf4S1Sm7";
+    private static final String PASSWORD = "RQt1YKf0GhXRnRjz";
 
     private PostgresDB() {}
 

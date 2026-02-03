@@ -10,10 +10,9 @@ import java.util.stream.Collectors;
 
 public class CarService {
 
-    private final CarRepository carRepository;
+    private final CarRepository carRepository = new CarRepository();
 
     public CarService() {
-        this.carRepository = new CarRepository();
     }
 
     public Car addCar(String type, String brand, String model, int year, double pricePerDay) throws SQLException {

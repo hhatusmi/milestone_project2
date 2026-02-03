@@ -7,11 +7,29 @@ public class CarFactory {
     public static Car createCar(String type, String brand, String model, int year, double pricePerDay) {
         switch (type.toLowerCase()) {
             case "sedan":
-                return new Car(brand, model, year, pricePerDay, "Sedan");
+                return new Car.CarBuilder()
+                        .setBrand(brand)
+                        .setModel(model)
+                        .setYear(year)
+                        .setPricePerDay(pricePerDay)
+                        .setType("Sedan")
+                        .build();
             case "suv":
-                return new Car(brand, model, year, pricePerDay, "SUV");
+                return new Car.CarBuilder()
+                        .setBrand(brand)
+                        .setModel(model)
+                        .setYear(year)
+                        .setPricePerDay(pricePerDay)
+                        .setType("SUV")
+                        .build();
             case "truck":
-                return new Car(brand, model, year, pricePerDay, "Truck");
+                return new Car.CarBuilder()
+                        .setBrand(brand)
+                        .setModel(model)
+                        .setYear(year)
+                        .setPricePerDay(pricePerDay)
+                        .setType("Truck")
+                        .build();
             default:
                 throw new IllegalArgumentException("Unknown car type: " + type);
         }

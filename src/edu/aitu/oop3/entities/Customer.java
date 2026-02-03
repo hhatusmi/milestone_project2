@@ -1,6 +1,6 @@
 package edu.aitu.oop3.entities;
 
-public class Customer {
+public class Customer implements Identifiable {
     private int id;
     private String name;
     private String email;
@@ -21,7 +21,9 @@ public class Customer {
         this.phoneNumber = phoneNumber;
     }
 
+    @Override
     public int getId() { return id; }
+    @Override
     public void setId(int id) { this.id = id; }
 
     public String getName() { return name; }
@@ -40,3 +42,4 @@ public class Customer {
                 ", phoneNumber='" + phoneNumber + '\'' + '}';
     }
 }
+

@@ -10,10 +10,10 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Connecting to Supabase...");
 
-        try {
-            DatabaseConnection db = DatabaseConnection.getInstance();
-            Connection connection = db.getConnection();
+        // Получаем подключение через Singleton
+        Connection connection = DatabaseConnection.getConnection();
 
+        try {
             System.out.println("Connected successfully!");
 
             String sql = "SELECT CURRENT_TIMESTAMP";
@@ -26,9 +26,8 @@ public class Main {
             }
 
         } catch (SQLException e) {
-            System.out.println("Error while connecting to database:");
+            System.out.println("Error while executing query:");
             e.printStackTrace();
         }
     }
 }
-

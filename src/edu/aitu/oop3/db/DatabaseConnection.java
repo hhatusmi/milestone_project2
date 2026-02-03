@@ -11,17 +11,18 @@ public class DatabaseConnection {
 
     private static final String URL =
             "jdbc:postgresql://aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres?sslmode=require";
-    private static final String USER = "postgres.ftmenecmibzocczrpnec";
-    private static final String PASSWORD = System.getenv("DB_PASSWORD");
+    private static final String USER = "postgres";
+    private static final String PASSWORD = "YOUR_PASSWORD";
 
-    private DatabaseConnection() throws SQLException {
-        if (PASSWORD == null || PASSWORD.isBlank()) {
-            throw new RuntimeException("DB_PASSWORD is not set");
+    private DatabaseConnection() {
+        try {
+            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (SQLException e) {
+            throw new RuntimeException("Database connection failed", e);
         }
-        this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
-    public static DatabaseConnection getInstance() throws SQLException {
+    public static DatabaseConnection getInstance() {
         if (instance == null) {
             instance = new DatabaseConnection();
         }
@@ -32,4 +33,3 @@ public class DatabaseConnection {
         return connection;
     }
 }
-

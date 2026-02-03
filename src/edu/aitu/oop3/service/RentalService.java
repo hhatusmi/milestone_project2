@@ -1,38 +1,35 @@
 package edu.aitu.oop3.service;
 
-import edu.aitu.oop3.model.Customer;
-import edu.aitu.oop3.model.Payment;
-import edu.aitu.oop3.repository.jdbc.CustomerRepository;
-import edu.aitu.oop3.repository.jdbc.PaymentRepository;
-
+import edu.aitu.oop3.model.Car;
+import edu.aitu.oop3.model.Rental;
+import edu.aitu.oop3.repository.jdbc.RentalRepository;
+import edu.aitu.oop3.service.CarService;
+import java.time.LocalDate;
+import java.util.List;
 public class RentalService {
-    private CustomerRepository customerRepository;
-    private PaymentRepository paymentRepository;
-
-
-    public RentalService(CustomerRepository customerRepository, PaymentRepository paymentRepository) {
-        this.customerRepository = customerRepository;
-        this.paymentRepository = paymentRepository;
+    private final RentalRepository rentalRepository = new RentalRepository();
+    private final CarService carService = new CarService();
+    public Rental createRental(int carId, String customerName, LocalDate start, LocalDate end) {
+        Car car = carService.getCarById(carId);
+        if (car == null) throw new IllegalArgumentException("Car not found: " + carId);
+        if (!car.isAvailable()) throw new IllegalStateException("Car is not available");
+        Rental rental = Rental.builder()
+                .carId(carId)
+                .customerName(customerName)
+                .startDate(start)
+                .endDate(end)
+                .build();
+        rentalRepository.save(rental);
+        carService.setAvailability(carId, false);
+        return rental;
     }
-
-    public boolean createRental(int customerId, double amount, String paymentDate) {
-        Customer customer = CustomerRepository.getcustomerById(customerId);
-
-        if (customer != null) {
-            Payment payment = new Payment(0, customerId, amount, paymentDate);
-            try {
-                PaymentRepository.addPayment(payment);
-                System.out.println("Rental created successfully for " + customer.getName());
-                return true;
-            } catch (Exception e) {
-                System.out.println("Error while creating rental payment: " + e.getMessage());
-                return false;
-            }
-        }
-
-        System.out.println("Customer not found!");
-        return false;
+    public List<Rental> getAllRentals() {
+        return rentalRepository.findAll();
+    }
+    public List<Rental> findRentalsByCustomer(String customer) {
+        return rentalRepository.findAll()
+                .stream()
+                .filter(r -> r.getCustomerName().equalsIgnoreCase(customer))
+                .toList();
     }
 }
-
-

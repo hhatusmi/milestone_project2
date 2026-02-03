@@ -12,22 +12,18 @@ public class RentalRepository {
 
     public void save(Rental rental) {
         String sql = "INSERT INTO rentals (car_id, customer_name, start_date, end_date) VALUES (?, ?, ?, ?)";
-        try {
-            // Получаем Singleton
-            DatabaseConnection db = DatabaseConnection.getInstance();
-            Connection conn = db.getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                ps.setInt(1, rental.getCarId());
-                ps.setString(2, rental.getCustomerName());
-                ps.setDate(3, Date.valueOf(rental.getStartDate()));
-                ps.setDate(4, Date.valueOf(rental.getEndDate()));
-                ps.executeUpdate();
+            ps.setInt(1, rental.getCarId());
+            ps.setString(2, rental.getCustomerName());
+            ps.setDate(3, Date.valueOf(rental.getStartDate()));
+            ps.setDate(4, Date.valueOf(rental.getEndDate()));
+            ps.executeUpdate();
 
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        rental.setId(rs.getInt(1));
-                    }
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    rental.setId(rs.getInt(1));
                 }
             }
 
@@ -41,23 +37,19 @@ public class RentalRepository {
         String sql = "SELECT id, car_id, customer_name, start_date, end_date FROM rentals ORDER BY id";
         List<Rental> rentals = new ArrayList<>();
 
-        try {
-            // Получаем Singleton
-            DatabaseConnection db = DatabaseConnection.getInstance();
-            Connection conn = db.getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-            try (PreparedStatement ps = conn.prepareStatement(sql);
-                 ResultSet rs = ps.executeQuery()) {
-
-                while (rs.next()) {
-                    int id = rs.getInt("id");
-                    int carId = rs.getInt("car_id");
-                    String customerName = rs.getString("customer_name");
-                    LocalDate startDate = rs.getDate("start_date").toLocalDate();
-                    LocalDate endDate = rs.getDate("end_date").toLocalDate();
-
-                    rentals.add(new Rental(id, carId, customerName, startDate, endDate));
-                }
+            while (rs.next()) {
+                Rental rental = Rental.builder()
+                        .carId(rs.getInt("car_id"))
+                        .customerName(rs.getString("customer_name"))
+                        .startDate(rs.getDate("start_date").toLocalDate())
+                        .endDate(rs.getDate("end_date").toLocalDate())
+                        .build();
+                rental.setId(rs.getInt("id"));
+                rentals.add(rental);
             }
 
         } catch (SQLException e) {

@@ -1,11 +1,11 @@
 package edu.aitu.oop3.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface Repository<T> {
-    void save(T item);
-    List<T> findAll();
-    Optional<T> findById(int id);
-    void delete(int id);
+    T create(T entity) throws Exception;
+    T findById(int id) throws Exception;
+    List<T> findAll() throws Exception;
+    void update(T entity) throws Exception;
+    void delete(int id) throws Exception;
 }

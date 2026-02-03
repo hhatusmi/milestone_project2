@@ -49,6 +49,11 @@ public class CustomerRepository implements Repository<Customer> {
     }
 
     @Override
+    public void save(Customer item) {
+
+    }
+
+    @Override
     public List<Customer> findAll() throws SQLException {
         List<Customer> customers = new ArrayList<>();
         String sql = "SELECT * FROM customers";

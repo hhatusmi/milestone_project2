@@ -1,124 +1,103 @@
 package edu.aitu.oop3.repository;
 
+import edu.aitu.oop3.db.DatabaseConnection;
 import edu.aitu.oop3.entities.Car;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.aitu.oop3.db.DatabaseConnection.*;
+public class CarRepository implements Repository<Car> {
 
-public class CarRepository {
+    private final Connection connection;
 
-    public void save(Car car) {
-        String sql = """
-            INSERT INTO cars (plate, brand, model, year, daily_price, status, available)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            """;
-
-        try {
-            Connection conn = getConnection();
-
-            try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                ps.setString(1, car.getPlate());
-                ps.setString(2, car.getBrand());
-                ps.setString(3, car.getModel());
-                ps.setInt(4, car.getYear());
-                ps.setBigDecimal(5, car.getDailyPrice());
-                ps.setString(6, car.getStatus());
-                ps.setBoolean(7, car.isAvailable());
-
-                ps.executeUpdate();
-
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        car.setId(rs.getInt(1));
-                    }
-                }
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error saving car", e);
-        }
+    public CarRepository() {
+        this.connection = DatabaseConnection.getInstance().getConnection();
     }
 
-    public List<Car> findAll() {
-        String sql = "SELECT id, plate, brand, model, year, daily_price, status, available FROM cars ORDER BY id";
-        List<Car> cars = new ArrayList<>();
-
-        try {
-            Connection conn = getInstance().getConnection();
-
-            try (PreparedStatement ps = conn.prepareStatement(sql);
-                 ResultSet rs = ps.executeQuery()) {
-
-                while (rs.next()) {
-                    cars.add(new Car(
-                            rs.getInt("id"),
-                            rs.getString("plate"),
-                            rs.getString("brand"),
-                            rs.getString("model"),
-                            rs.getInt("year"),
-                            rs.getBigDecimal("daily_price"),
-                            rs.getString("status"),
-                            rs.getBoolean("available")
-                    ));
-                }
+    @Override
+    public Car create(Car car) throws SQLException {
+        String sql = "INSERT INTO cars (brand, model, year, price_per_day, type) VALUES (?, ?, ?, ?, ?) RETURNING id";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, car.getBrand());
+            stmt.setString(2, car.getModel());
+            stmt.setInt(3, car.getYear());
+            stmt.setDouble(4, car.getPricePerDay());
+            stmt.setString(5, car.getType());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                car.setId(rs.getInt("id"));
             }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error reading cars", e);
         }
-
-        return cars;
+        return car;
     }
 
-    public Car findById(int id) {
-        String sql = "SELECT id, plate, brand, model, year, daily_price, status, available FROM cars WHERE id = ?";
-
-        try {
-            Connection conn = getInstance().getConnection();
-
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, id);
-
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return new Car(
-                                rs.getInt("id"),
-                                rs.getString("plate"),
-                                rs.getString("brand"),
-                                rs.getString("model"),
-                                rs.getInt("year"),
-                                rs.getBigDecimal("daily_price"),
-                                rs.getString("status"),
-                                rs.getBoolean("available")
-                        );
-                    }
-                }
+    @Override
+    public Car findById(int id) throws SQLException {
+        String sql = "SELECT * FROM cars WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Car(
+                        rs.getInt("id"),
+                        rs.getString("brand"),
+                        rs.getString("model"),
+                        rs.getInt("year"),
+                        rs.getDouble("price_per_day"),
+                        rs.getString("type")
+                );
             }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error finding car by id", e);
         }
-
         return null;
     }
 
-    public void setAvailability(int carId, boolean available) {
-        String sql = "UPDATE cars SET available = ? WHERE id = ?";
+    @Override
+    public void save(Car item) {
 
-        try {
-            Connection conn = getInstance().getConnection();
+    }
 
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setBoolean(1, available);
-                ps.setInt(2, carId);
-                ps.executeUpdate();
+    @Override
+    public List<Car> findAll() throws SQLException {
+        List<Car> cars = new ArrayList<>();
+        String sql = "SELECT * FROM cars";
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                cars.add(new Car(
+                        rs.getInt("id"),
+                        rs.getString("brand"),
+                        rs.getString("model"),
+                        rs.getInt("year"),
+                        rs.getDouble("price_per_day"),
+                        rs.getString("type")
+                ));
             }
+        }
+        return cars;
+    }
 
-        } catch (SQLException e) {
-            throw new RuntimeException("Error updating car availability", e);
+    @Override
+    public void update(Car car) throws SQLException {
+        String sql = "UPDATE cars SET brand = ?, model = ?, year = ?, price_per_day = ?, type = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, car.getBrand());
+            stmt.setString(2, car.getModel());
+            stmt.setInt(3, car.getYear());
+            stmt.setDouble(4, car.getPricePerDay());
+            stmt.setString(5, car.getType());
+            stmt.setInt(6, car.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public void delete(int id) throws SQLException {
+        String sql = "DELETE FROM cars WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
         }
     }
 }
+

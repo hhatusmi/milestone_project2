@@ -1,48 +1,65 @@
 package edu.aitu.oop3.entities;
+
 import java.time.LocalDate;
+
 public class Rental {
     private int id;
-    private int carId;
-    private String customerName;
+    private Customer customer;
+    private Car car;
     private LocalDate startDate;
     private LocalDate endDate;
+    private double totalPrice;
+
     public Rental() {}
+
+    public Rental(int id, Customer customer, Car car,
+                  LocalDate startDate, LocalDate endDate, double totalPrice) {
+        this.id = id;
+        this.customer = customer;
+        this.car = car;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.totalPrice = totalPrice;
+    }
+
+    public Rental(Customer customer, Car car,
+                  LocalDate startDate, LocalDate endDate, double totalPrice) {
+        this.customer = customer;
+        this.car = car;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.totalPrice = totalPrice;
+    }
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-    public int getCarId() { return carId; }
-    public String getCustomerName() { return customerName; }
+
+    public Customer getCustomer() { return customer; }
+    public void setCustomer(Customer customer) { this.customer = customer; }
+
+    public Car getCar() { return car; }
+    public void setCar(Car car) { this.car = car; }
+
     public LocalDate getStartDate() { return startDate; }
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+
     public LocalDate getEndDate() { return endDate; }
-    public static Builder builder() {
-        return new Builder();
-    }
-    public static class Builder {
-        private final Rental rental = new Rental();
-        public Builder carId(int carId) {
-            rental.carId = carId;
-            return this;
-        }
-        public Builder customerName(String name) {
-            rental.customerName = name;
-            return this;
-        }
-        public Builder startDate(LocalDate date) {
-            rental.startDate = date;
-            return this;
-        }
-        public Builder endDate(LocalDate date) {
-            rental.endDate = date;
-            return this;
-        }
-        public Rental build() {
-            if (rental.carId <= 0) throw new IllegalArgumentException("carId must be > 0");
-            if (rental.customerName == null || rental.customerName.isBlank())
-                throw new IllegalArgumentException("customerName is required");
-            if (rental.startDate == null || rental.endDate == null)
-                throw new IllegalArgumentException("startDate and endDate are required");
-            if (rental.endDate.isBefore(rental.startDate))
-                throw new IllegalArgumentException("endDate cannot be before startDate");
-            return rental;
-        }
+    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
+
+    public double getTotalPrice() { return totalPrice; }
+    public void setTotalPrice(double totalPrice) { this.totalPrice = totalPrice; }
+
+    @Override
+    public String toString() {
+        return "Rental{" +
+                "id=" + id +
+                ", customer=" + customer +
+                ", car=" + car +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", totalPrice=" + totalPrice +
+                '}';
     }
 }
+
+

@@ -1,4 +1,4 @@
-package edu.aitu.oop3.repository.jdbc;
+package edu.aitu.oop3.repository;
 
 import java.util.List;
 import java.util.Optional;

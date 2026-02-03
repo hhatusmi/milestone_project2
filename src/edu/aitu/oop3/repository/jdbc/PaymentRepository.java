@@ -30,33 +30,4 @@ public class PaymentRepository {
         db.delete(id);
     }
 
-    public class paymentRepository implements Repository<Payment> {
-
-        private List<Payment> payments = new ArrayList<>();
-
-        @Override
-        public void save(Payment payment) {
-            payments.add(payment);
-            System.out.println("Saving payment for customerId: " + payment.getCustomerId() + ", amount: " + payment.getAmount());
-        }
-
-        @Override
-        public List<Payment> findAll() {
-            System.out.println("Returning all payments");
-            return payments;
-        }
-
-        @Override
-        public Optional<Payment> findById(int id) {
-            return payments.stream()
-                    .filter(p -> p.getId() == id)
-                    .findFirst();
-        }
-
-        @Override
-        public void delete(int id) {
-            payments.removeIf(p -> p.getId() == id);
-            System.out.println("Deleted payment with id: " + id);
-        }
-    }
 }

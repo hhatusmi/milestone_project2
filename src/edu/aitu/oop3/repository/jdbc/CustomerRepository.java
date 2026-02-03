@@ -31,28 +31,4 @@ public class CustomerRepository {
 
     public static Customer getcustomerById(int customerId){ return null; }
 
-    public class customerRepository implements Repository<Customer> {
-
-        @Override
-        public void save(Customer customer) {
-            System.out.println("Saving customer: " + customer.getName());
-        }
-
-        @Override
-        public List<Customer> findAll() {
-            System.out.println("Returning all customers");
-            return null;
-        }
-
-        @Override
-        public Optional<Customer> findById(int id) {
-            System.out.println("Finding customer by id: " + id);
-            return Optional.empty();
-        }
-
-        @Override
-        public void delete(int id) {
-            System.out.println("Deleting customer with id: " + id);
-        }
-    }
 }

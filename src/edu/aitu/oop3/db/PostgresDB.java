@@ -1,19 +1,35 @@
 package edu.aitu.oop3.db;
 
-import edu.aitu.oop3.model.Customer;
+import edu.aitu.oop3.entities.Customer;
 
 import java.sql.*;
 
 public class PostgresDB implements IDB {
+
+    private static PostgresDB instance;
     private Connection connection;
+
+    private static final String URL =
+            "jdbc:postgresql://aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres?sslmode=require";
+    private static final String USER = "postgres.ftmenecmibzocczrpnec";
+    private static final String PASSWORD = "wrwnUdAIXf4S1Sm7";
+
+    private PostgresDB() {}
+
+    public static PostgresDB getInstance() {
+        if (instance == null) {
+            instance = new PostgresDB();
+        }
+        return instance;
+    }
 
     @Override
     public void connect() {
         try {
-            connection = DriverManager.getConnection("jdbc:postgresql://aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres?sslmode=require", "postgres.ftmenecmibzocczrpnec", "DB_PASSWORD=wrwnUdAIXf4S1Sm7");
-            System.out.println("Connected to the database!");
+            connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            System.out.println("Connected to PostgreSQL (Supabase)");
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Database connection failed", e);
         }
     }
 
@@ -22,21 +38,24 @@ public class PostgresDB implements IDB {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
-                System.out.println("Disconnected from the database.");
+                System.out.println("Database disconnected");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    // ================= CUSTOMER CRUD =================
+
     @Override
     public void create(Object entity) {
-        if (entity instanceof Customer) {
-            String sql = "INSERT INTO customers (name, email) VALUES (?, ?)";
+        if (entity instanceof Customer customer) {
+            String sql =
+                    "INSERT INTO customers (name, email, phone_number) VALUES (?, ?, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                Customer customer = (Customer) entity;
                 stmt.setString(1, customer.getName());
                 stmt.setString(2, customer.getEmail());
+                stmt.setString(3, customer.getPhoneNumber());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -49,9 +68,15 @@ public class PostgresDB implements IDB {
         String sql = "SELECT * FROM customers WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
-            ResultSet resultSet = stmt.executeQuery();
-            if (resultSet.next()) {
-                return new Customer(resultSet.getInt("id"), resultSet.getString("name"), resultSet.getString("email"));
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new Customer(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("phone_number")
+                );
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -61,13 +86,14 @@ public class PostgresDB implements IDB {
 
     @Override
     public void update(Object entity) {
-        if (entity instanceof Customer) {
-            String sql = "UPDATE customers SET name = ?, email = ? WHERE id = ?";
+        if (entity instanceof Customer customer) {
+            String sql =
+                    "UPDATE customers SET name = ?, email = ?, phone_number = ? WHERE id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                Customer customer = (Customer) entity;
                 stmt.setString(1, customer.getName());
                 stmt.setString(2, customer.getEmail());
-                stmt.setInt(3, customer.getId());
+                stmt.setString(3, customer.getPhoneNumber());
+                stmt.setInt(4, customer.getId());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();

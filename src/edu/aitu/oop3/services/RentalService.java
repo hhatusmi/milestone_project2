@@ -1,9 +1,9 @@
-package edu.aitu.oop3.service;
+package edu.aitu.oop3.services;
 
-import edu.aitu.oop3.model.Car;
-import edu.aitu.oop3.model.Rental;
-import edu.aitu.oop3.repository.jdbc.RentalRepository;
-import edu.aitu.oop3.service.CarService;
+import edu.aitu.oop3.entities.Car;
+import edu.aitu.oop3.entities.Rental;
+import edu.aitu.oop3.repository.RentalRepository;
+
 import java.time.LocalDate;
 import java.util.List;
 public class RentalService {

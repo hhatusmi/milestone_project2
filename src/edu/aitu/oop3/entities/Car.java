@@ -1,4 +1,4 @@
-package edu.aitu.oop3.model;
+package edu.aitu.oop3.entities;
 import java.math.BigDecimal;
 public class Car {
     private int id;
@@ -47,5 +47,6 @@ public class Car {
 
     public int isAutomatic() {
 
+        return 0;
     }
 }

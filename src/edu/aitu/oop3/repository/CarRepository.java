@@ -1,11 +1,12 @@
-package edu.aitu.oop3.repository.jdbc;
+package edu.aitu.oop3.repository;
 
-import edu.aitu.oop3.db.DatabaseConnection;
-import edu.aitu.oop3.model.Car;
+import edu.aitu.oop3.entities.Car;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static edu.aitu.oop3.db.DatabaseConnection.*;
 
 public class CarRepository {
 
@@ -16,7 +17,7 @@ public class CarRepository {
             """;
 
         try {
-            Connection conn = DatabaseConnection.getInstance().getConnection();
+            Connection conn = getConnection();
 
             try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, car.getPlate());
@@ -46,7 +47,7 @@ public class CarRepository {
         List<Car> cars = new ArrayList<>();
 
         try {
-            Connection conn = DatabaseConnection.getInstance().getConnection();
+            Connection conn = getInstance().getConnection();
 
             try (PreparedStatement ps = conn.prepareStatement(sql);
                  ResultSet rs = ps.executeQuery()) {
@@ -76,7 +77,7 @@ public class CarRepository {
         String sql = "SELECT id, plate, brand, model, year, daily_price, status, available FROM cars WHERE id = ?";
 
         try {
-            Connection conn = DatabaseConnection.getInstance().getConnection();
+            Connection conn = getInstance().getConnection();
 
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, id);
@@ -108,7 +109,7 @@ public class CarRepository {
         String sql = "UPDATE cars SET available = ? WHERE id = ?";
 
         try {
-            Connection conn = DatabaseConnection.getInstance().getConnection();
+            Connection conn = getInstance().getConnection();
 
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setBoolean(1, available);

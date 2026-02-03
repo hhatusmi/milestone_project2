@@ -1,4 +1,4 @@
-package edu.aitu.oop3.model;
+package edu.aitu.oop3.entities;
 import java.time.LocalDate;
 public class Rental {
     private int id;
@@ -6,7 +6,7 @@ public class Rental {
     private String customerName;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Rental() {}
+    public Rental() {}
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public int getCarId() { return carId; }

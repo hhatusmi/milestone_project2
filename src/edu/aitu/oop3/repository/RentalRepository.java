@@ -1,10 +1,9 @@
-package edu.aitu.oop3.repository.jdbc;
+package edu.aitu.oop3.repository;
 
 import edu.aitu.oop3.db.DatabaseConnection;
-import edu.aitu.oop3.model.Rental;
+import edu.aitu.oop3.entities.Rental;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

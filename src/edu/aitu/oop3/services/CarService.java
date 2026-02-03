@@ -1,6 +1,6 @@
-package edu.aitu.oop3.service;
-import edu.aitu.oop3.model.Car;
-import edu.aitu.oop3.repository.jdbc.CarRepository;
+package edu.aitu.oop3.services;
+import edu.aitu.oop3.entities.Car;
+import edu.aitu.oop3.repository.CarRepository;
 import java.util.List;
 public class CarService {
     private final CarRepository carRepository = new CarRepository();

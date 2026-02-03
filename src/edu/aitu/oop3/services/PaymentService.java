@@ -1,7 +1,7 @@
 package edu.aitu.oop3.services;
 
 import edu.aitu.oop3.entities.Payment;
-import edu.aitu.oop3.repositories.PaymentRepository;
+import edu.aitu.oop3.repository.PaymentRepository;
 
 import java.sql.SQLException;
 import java.time.LocalDate;

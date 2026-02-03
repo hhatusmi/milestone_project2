@@ -18,8 +18,18 @@ public class GenericRepository<T> implements Repository<T> {
     }
 
     @Override
-    public Optional<T> findById(int id) {
-        return Optional.empty();
+    public void update(T entity) throws Exception {
+
+    }
+
+    @Override
+    public T create(T entity) throws Exception {
+        return null;
+    }
+
+    @Override
+    public T findById(int id) {
+        return (T) Optional.empty();
     }
 
     @Override

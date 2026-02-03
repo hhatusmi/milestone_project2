@@ -51,6 +51,11 @@ public class PaymentRepository implements Repository<Payment> {
     }
 
     @Override
+    public void save(Payment item) {
+
+    }
+
+    @Override
     public List<Payment> findAll() throws SQLException {
         List<Payment> payments = new ArrayList<>();
         String sql = "SELECT * FROM payments";

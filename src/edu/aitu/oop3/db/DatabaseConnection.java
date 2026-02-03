@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class DatabaseConnection {
 
     private static DatabaseConnection instance;
-    private Connection connection;
+    private static Connection connection;
 
     private static final String URL =
             "jdbc:postgresql://aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres?sslmode=require";
@@ -29,7 +29,7 @@ public class DatabaseConnection {
         return instance;
     }
 
-    public Connection getConnection() {
+    public static Connection getConnection() {
         return connection;
     }
 }
